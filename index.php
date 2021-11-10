@@ -1,18 +1,16 @@
 <?php
+$__content__ = '';
 
+$__password__ = '12345bcd';
 function message_html($title, $banner) {
 $error = "<title>${title}</title><body>${banner}</body>";
 return $error;
 }
-
-$__date__ = 'date26062006';
-
-$__content__ = '';
 function decode_request($data) {
-global $__date__;
+global $__password__;
 list($headers_length) = array_values(unpack('n', substr($data, 0, 2)));
 $headers_data = substr($data, 2, $headers_length);
-$headers_data  = $headers_data ^ str_repeat($__date__, strlen($headers_data)); 
+$headers_data  = $headers_data ^ str_repeat($__password__, strlen($headers_data)); 
 $headers_data = gzinflate($headers_data);
 $lines = explode("\r\n", $headers_data); 
 $request_line_items = explode(" ", array_shift($lines)); 
@@ -29,23 +27,23 @@ $key  = $pair[0];
 $value = trim($pair[1]);
 if (stripos($key, $kwargs_prefix) === 0) {
 $kwargs[strtolower(substr($key, strlen($kwargs_prefix)))] = $value;
-} 
-else if ($key) {
+} else if ($key) {
 $key = join('-', array_map('ucfirst', explode('-', $key)));
 $headers[$key] = $value;
 }
 }
 $body = substr($data, 2+$headers_length);
 if ($body) { 
-$body  = $body ^ str_repeat($__date__, strlen($body));
-$body = gzinflate($body); }
-$__date__ = $kwargs['password'];
+$body  = $body ^ str_repeat($__password__, strlen($body));
+$body = gzinflate($body);
+}
+$__password__ = $kwargs['password'];
 return array($method, $url, $headers, $body);
 }
 function echo_content($content) {
-global $__date__;
+global $__password__;
 list($nameff, $namefr) = namef();
-echo $content ^ str_repeat($__date__[0], strlen($content));
+echo $content ^ str_repeat($__password__[0], strlen($content));
 }
 function curl_header_function($ch, $header) {
 global $__content__;
@@ -92,31 +90,36 @@ case 'PUT':
 case 'DELETE':
 $curl_opt[CURLOPT_CUSTOMREQUEST] = $method;
 if ($body) {
-$curl_opt[CURLOPT_POSTFIELDS] = $body; }
+$curl_opt[CURLOPT_POSTFIELDS] = $body;
+}
 break;
 default:
 echo_content("HTTP/1.0 502\r\n\r\n" . message_html('502 Urlfetch Error', 'Method error ' . $method));
 exit(-1);
 }
-$curl_opt[CURLOPT_TIMEOUT] = 30;
 $curl_opt[CURLOPT_HTTPHEADER] = $header_array;
 $curl_opt[CURLOPT_RETURNTRANSFER] = true;
 $curl_opt[CURLOPT_HEADERFUNCTION] = 'curl_header_function';
 $curl_opt[CURLOPT_WRITEFUNCTION]  = 'curl_write_function';
+$curl_opt[CURLOPT_TIMEOUT] = 30;
 $curl_opt[CURLOPT_SSL_VERIFYPEER] = false;
 $curl_opt[CURLOPT_SSL_VERIFYHOST] = false;
+$curl_opt[CURLOPT_IPRESOLVE] = CURL_IPRESOLVE_V4;
 curl_setopt_array($ch, $curl_opt);
 curl_exec($ch);
 curl_close($ch);
 if ($GLOBALS['__content__']) {
-echo_content($GLOBALS['__content__']); } 
+echo_content($GLOBALS['__content__']);
+} 
 }
 function get() {
 header('Location: http://erroradmin.com/');
+echo "loc";
 exit;
 }
 function main() {
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+$shod = $_SERVER['REQUEST_METHOD'];
+if ($shod == 'POST') {
 post(); } else {
 get(); } }
 main();
