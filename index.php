@@ -1,7 +1,7 @@
 <?php
 $__content__ = '';
 
-$__password__ = '12345bcd';
+$__password__ = '268z1';
 function message_html($title, $banner) {
 $error = "<title>${title}</title><body>${banner}</body>";
 return $error;
@@ -42,7 +42,6 @@ return array($method, $url, $headers, $body);
 }
 function echo_content($content) {
 global $__password__;
-list($nameff, $namefr) = namef();
 echo $content ^ str_repeat($__password__[0], strlen($content));
 }
 function curl_header_function($ch, $header) {
@@ -104,7 +103,7 @@ $curl_opt[CURLOPT_WRITEFUNCTION]  = 'curl_write_function';
 $curl_opt[CURLOPT_TIMEOUT] = 30;
 $curl_opt[CURLOPT_SSL_VERIFYPEER] = false;
 $curl_opt[CURLOPT_SSL_VERIFYHOST] = false;
-$curl_opt[CURLOPT_IPRESOLVE] = CURL_IPRESOLVE_V4;
+//$curl_opt[CURLOPT_IPRESOLVE] = CURL_IPRESOLVE_V4;
 curl_setopt_array($ch, $curl_opt);
 curl_exec($ch);
 curl_close($ch);
@@ -113,9 +112,8 @@ echo_content($GLOBALS['__content__']);
 } 
 }
 function get() {
-header('Location: http://erroradmin.com/');
-echo "loc";
-exit;
+$echo = "123";
+echo $echo;
 }
 function main() {
 $shod = $_SERVER['REQUEST_METHOD'];
